@@ -1,8 +1,8 @@
-package com.ssafy.italian_brainrot.service;
+package com.ssafy.italian_brainrot.service.product;
 
 
-import com.ssafy.italian_brainrot.dto.ProductDTO;
-import com.ssafy.italian_brainrot.dto.ProductWithCommentDTO;
+import com.ssafy.italian_brainrot.dto.product.ProductDTO;
+import com.ssafy.italian_brainrot.dto.product.ProductWithCommentDTO;
 import com.ssafy.italian_brainrot.entity.Comment;
 import com.ssafy.italian_brainrot.entity.OrderDetail;
 import com.ssafy.italian_brainrot.entity.Product;

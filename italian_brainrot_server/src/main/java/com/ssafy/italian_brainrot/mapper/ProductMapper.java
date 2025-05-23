@@ -1,6 +1,6 @@
 package com.ssafy.italian_brainrot.mapper;
 
-import com.ssafy.italian_brainrot.dto.ProductDTO;
+import com.ssafy.italian_brainrot.dto.product.ProductDTO;
 import com.ssafy.italian_brainrot.entity.Product;
 import org.springframework.stereotype.Component;
 

@@ -1,5 +1,7 @@
-package com.ssafy.italian_brainrot.dto;
+package com.ssafy.italian_brainrot.dto.product;
 
+import com.ssafy.italian_brainrot.dto.CommentInfoDTO;
+import com.ssafy.italian_brainrot.enumerate.InventoryItemType;
 import lombok.*;
 
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
 public class ProductWithCommentDTO {
     private int id;
     private String name;
-    private String type;
+    private InventoryItemType type;
     private int price;
     private String img;
 
