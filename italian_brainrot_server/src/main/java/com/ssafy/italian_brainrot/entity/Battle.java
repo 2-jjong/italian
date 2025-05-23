@@ -1,7 +1,7 @@
 package com.ssafy.italian_brainrot.entity;
 
+import com.ssafy.italian_brainrot.enumerate.BattleState;
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -44,9 +44,4 @@ public class Battle {
     @Builder.Default
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    public enum BattleState {
-        WAITING, RUNNING, CANCEL, USER1, USER2
-    }
-
 }

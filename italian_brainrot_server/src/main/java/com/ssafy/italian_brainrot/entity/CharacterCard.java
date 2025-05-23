@@ -1,7 +1,6 @@
 package com.ssafy.italian_brainrot.entity;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
 import lombok.*;
 
 @Entity
@@ -13,7 +12,7 @@ import lombok.*;
 @Setter
 @ToString
 @Builder
-class CharacterCard extends Card {
+public class CharacterCard extends Card {
     @Column(length = 10, nullable = false)
     private String grade;
 

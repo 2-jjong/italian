@@ -1,5 +1,6 @@
 package com.ssafy.italian_brainrot.dto;
 
+import com.ssafy.italian_brainrot.enumerate.BattleState;
 import lombok.*;
 
 
@@ -15,7 +16,7 @@ public class BattleDTO {
     private String userId2;
     private int user1CardId;
     private int user2CardId;
-    private BattleStateDTO state;
+    private BattleState state;
     private String content;
     private long createdAt;
 }

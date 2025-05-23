@@ -1,7 +1,6 @@
 package com.ssafy.italian_brainrot.entity;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
 import lombok.*;
 
 @Entity
@@ -14,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Comment {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)
