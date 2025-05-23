@@ -1,6 +1,6 @@
-package com.ssafy.italian_brainrot.service;
+package com.ssafy.italian_brainrot.service.comment;
 
-import com.ssafy.italian_brainrot.dto.CommentDTO;
+import com.ssafy.italian_brainrot.dto.comment.CommentDTO;
 
 public interface CommentService {
 

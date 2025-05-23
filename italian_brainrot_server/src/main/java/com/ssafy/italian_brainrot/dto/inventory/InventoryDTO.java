@@ -1,5 +1,7 @@
-package com.ssafy.italian_brainrot.dto;
+package com.ssafy.italian_brainrot.dto.inventory;
 
+import com.ssafy.italian_brainrot.dto.card.CharacterCardDTO;
+import com.ssafy.italian_brainrot.dto.card.ResourceCardDTO;
 import com.ssafy.italian_brainrot.enumerate.InventoryItemType;
 import lombok.*;
 

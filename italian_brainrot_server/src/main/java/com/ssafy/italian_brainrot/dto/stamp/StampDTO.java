@@ -1,4 +1,4 @@
-package com.ssafy.italian_brainrot.dto;
+package com.ssafy.italian_brainrot.dto.stamp;
 
 import lombok.*;
 

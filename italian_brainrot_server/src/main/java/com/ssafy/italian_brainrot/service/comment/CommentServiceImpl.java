@@ -1,9 +1,9 @@
-package com.ssafy.italian_brainrot.service;
+package com.ssafy.italian_brainrot.service.comment;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ssafy.italian_brainrot.dto.CommentDTO;
+import com.ssafy.italian_brainrot.dto.comment.CommentDTO;
 import com.ssafy.italian_brainrot.entity.Comment;
 import com.ssafy.italian_brainrot.mapper.CommentMapper;
 import com.ssafy.italian_brainrot.repository.CommentRepository;

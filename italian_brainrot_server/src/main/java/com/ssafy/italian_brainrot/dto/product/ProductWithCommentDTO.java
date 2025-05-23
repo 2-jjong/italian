@@ -1,6 +1,6 @@
 package com.ssafy.italian_brainrot.dto.product;
 
-import com.ssafy.italian_brainrot.dto.CommentInfoDTO;
+import com.ssafy.italian_brainrot.dto.comment.CommentInfoDTO;
 import com.ssafy.italian_brainrot.enumerate.InventoryItemType;
 import lombok.*;
 

@@ -1,6 +1,6 @@
-package com.ssafy.italian_brainrot.service;
+package com.ssafy.italian_brainrot.service.inventory;
 
-import com.ssafy.italian_brainrot.dto.InventoryDTO;
+import com.ssafy.italian_brainrot.dto.inventory.InventoryDTO;
 import com.ssafy.italian_brainrot.entity.Inventory;
 import com.ssafy.italian_brainrot.mapper.InventoryMapper;
 import com.ssafy.italian_brainrot.repository.InventoryRepository;

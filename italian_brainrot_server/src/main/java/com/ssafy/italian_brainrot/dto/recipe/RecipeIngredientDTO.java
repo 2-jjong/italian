@@ -1,4 +1,4 @@
-package com.ssafy.italian_brainrot.dto;
+package com.ssafy.italian_brainrot.dto.recipe;
 
 import lombok.*;
 
@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecipeIngredientsDTO {
+public class RecipeIngredientDTO {
     private int resourceCardId;
     private int quantity;
     private int recipeId;

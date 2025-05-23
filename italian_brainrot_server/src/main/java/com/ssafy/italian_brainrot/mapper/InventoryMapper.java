@@ -1,6 +1,6 @@
 package com.ssafy.italian_brainrot.mapper;
 
-import com.ssafy.italian_brainrot.dto.InventoryDTO;
+import com.ssafy.italian_brainrot.dto.inventory.InventoryDTO;
 import com.ssafy.italian_brainrot.entity.*;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +12,7 @@ public class InventoryMapper {
                 .builder()
                 .id(entity.getId())
                 .userId(entity.getUser().getId())
-                .type(entity.getState())
+                .type(entity.getType())
                 .quantity(entity.getQuantity())
 //                .card(entity.getCard())
                 .build();
@@ -42,7 +42,7 @@ public class InventoryMapper {
                 .builder()
                 .id(dto.getId())
                 .user(User.builder().id(dto.getUserId()).build())
-                .state(dto.getType())
+                .type(dto.getType())
                 .quantity(dto.getQuantity())
                 .card(card)
                 .build();

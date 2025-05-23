@@ -1,5 +1,4 @@
 package com.ssafy.italian_brainrot.repository;
 
-public class Repository {
-
+public interface RecipeRepository {
 }

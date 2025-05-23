@@ -24,7 +24,7 @@ public class Inventory {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private InventoryItemType state = InventoryItemType.CHARACTER_CARD;
+    private InventoryItemType type = InventoryItemType.CHARACTER_CARD;
 
     @Column(nullable = false)
     private int quantity;
