@@ -12,14 +12,14 @@ import com.ssafy.italian_brainrot.repository.OrderRepository;
 import com.ssafy.italian_brainrot.repository.StampRepository;
 import com.ssafy.italian_brainrot.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
+@Service
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
