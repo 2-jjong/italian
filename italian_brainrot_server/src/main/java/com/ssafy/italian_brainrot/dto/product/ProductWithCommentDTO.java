@@ -1,6 +1,6 @@
 package com.ssafy.italian_brainrot.dto.product;
 
-import com.ssafy.italian_brainrot.dto.comment.CommentInfoDTO;
+import com.ssafy.italian_brainrot.dto.comment.CommentResponseDTO;
 import com.ssafy.italian_brainrot.enumerate.InventoryItemType;
 import lombok.*;
 
@@ -23,5 +23,5 @@ public class ProductWithCommentDTO {
     private int totalSells;
     private double averageStars;
 
-    private List<CommentInfoDTO> comments;
+    private List<CommentResponseDTO> comments;
 }

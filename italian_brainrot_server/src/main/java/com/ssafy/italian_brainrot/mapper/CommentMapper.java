@@ -1,34 +1,42 @@
 package com.ssafy.italian_brainrot.mapper;
 
-import com.ssafy.italian_brainrot.dto.comment.CommentInfoDTO;
-import com.ssafy.italian_brainrot.dto.comment.CommentRequestDTO;
+import com.ssafy.italian_brainrot.dto.comment.CommentResponseDTO;
+import com.ssafy.italian_brainrot.entity.User;
 import org.springframework.stereotype.Component;
 
-import com.ssafy.italian_brainrot.dto.comment.CommentDTO;
+import com.ssafy.italian_brainrot.dto.comment.CommentRequestDTO;
 import com.ssafy.italian_brainrot.entity.Comment;
 
 @Component
 public class CommentMapper {
-	public CommentDTO convertToCommentDTO(Comment entity) {
-		CommentDTO dto = new CommentDTO(entity.getId(), entity.getUserId(), entity.getProductId(), entity.getRating(),
-				entity.getComment());
-		return dto;
+
+	public Comment convertToComment(CommentRequestDTO dto) {
+		return Comment.builder()
+				.id(dto.getId())
+				.user(User.builder().id(dto.getUserId()).build())
+				.productId(dto.getProductId())
+				.rating(dto.getRating())
+				.comment(dto.getComment())
+				.build();
 	}
 
-	public Comment convertToComment(CommentDTO dto) {
-		Comment entity = new Comment(dto.getId(), dto.getUserId(), dto.getProductId(), dto.getRating(),
-				dto.getComment());
-		return entity;
-	}
-
-	public CommentInfoDTO convertToCommentInfo(Comment entity, String userName) {
-		return CommentInfoDTO.builder()
+	public CommentRequestDTO convertToCommentRequestDTO(Comment entity) {
+        return CommentRequestDTO.builder()
 				.id(entity.getId())
-				.userId(entity.getUserId())
 				.productId(entity.getProductId())
 				.rating(entity.getRating())
 				.comment(entity.getComment())
-				.userName(userName)
+				.build();
+	}
+
+	public CommentResponseDTO convertToCommentResponseDTO(Comment entity) {
+		return CommentResponseDTO.builder()
+				.id(entity.getId())
+				.userId(entity.getUser().getId())
+				.userName(entity.getUser().getName())
+				.productId(entity.getProductId())
+				.rating(entity.getRating())
+				.comment(entity.getComment())
 				.build();
 	}
 

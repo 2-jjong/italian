@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentInfoDTO {
+public class CommentResponseDTO {
     private int id;
     private String userId;
     private String userName;

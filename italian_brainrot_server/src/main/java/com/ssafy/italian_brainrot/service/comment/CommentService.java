@@ -1,14 +1,13 @@
 package com.ssafy.italian_brainrot.service.comment;
 
-import com.ssafy.italian_brainrot.dto.comment.CommentDTO;
+import com.ssafy.italian_brainrot.dto.comment.CommentRequestDTO;
 
 public interface CommentService {
 
-	CommentDTO addComment(CommentDTO comment);
+	Boolean insertComment(CommentRequestDTO commentRequestDTO);
 
-	CommentDTO updateComment(CommentDTO comment);
+	Boolean updateComment(CommentRequestDTO commentRequestDTO);
 
-	boolean removeComment(Integer commentId, String userId);
+	Boolean removeComment(Integer commentId, String userId);
 
-	CommentDTO selectComment(Integer id);
 }

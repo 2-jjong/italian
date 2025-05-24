@@ -28,7 +28,7 @@ public class CookieUtil {
         return userId != null ? userId.toString() : null;
     }
 
-    public boolean setLoginCookie(HttpServletResponse response, String userId) {
+    public Boolean setLoginCookie(HttpServletResponse response, String userId) {
         try {
             Cookie cookie = new Cookie("loginId", URLEncoder.encode(userId, "UTF-8"));
             cookie.setMaxAge(60 * 60 * 24);

@@ -1,7 +1,7 @@
 package com.ssafy.italian_brainrot.service.product;
 
 
-import com.ssafy.italian_brainrot.dto.comment.CommentInfoDTO;
+import com.ssafy.italian_brainrot.dto.comment.CommentResponseDTO;
 import com.ssafy.italian_brainrot.dto.product.ProductDTO;
 import com.ssafy.italian_brainrot.dto.product.ProductWithCommentDTO;
 import com.ssafy.italian_brainrot.entity.Comment;
@@ -14,7 +14,6 @@ import com.ssafy.italian_brainrot.repository.CommentRepository;
 import com.ssafy.italian_brainrot.repository.OrderDetailRepository;
 import com.ssafy.italian_brainrot.repository.ProductRepository;
 import com.ssafy.italian_brainrot.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,8 +28,6 @@ public class ProductServiceImpl implements ProductService {
 
     private final OrderDetailRepository orderDetailRepository;
 
-    private final UserRepository userRepository;
-
     private final ProductMapper productMapper;
 
     private final CommentMapper commentMapper;
@@ -38,13 +35,11 @@ public class ProductServiceImpl implements ProductService {
     public ProductServiceImpl(ProductRepository productRepository,
                               CommentRepository commentRepository,
                               OrderDetailRepository orderDetailRepository,
-                              UserRepository userRepository,
                               ProductMapper productMapper,
                               CommentMapper commentMapper) {
         this.productRepository = productRepository;
         this.commentRepository = commentRepository;
         this.orderDetailRepository = orderDetailRepository;
-        this.userRepository = userRepository;
         this.productMapper = productMapper;
         this.commentMapper = commentMapper;
     }
@@ -52,32 +47,30 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDTO> getProductList() {
         List<Product> entityList = productRepository.findAll();
-        List<ProductDTO> dtoList = entityList.stream().map((product) -> productMapper.convertToProductDTO(product)).toList();
-        return dtoList;
+        return entityList.stream().map(productMapper::convertToProductDTO).toList();
     }
 
     @Override
-    public ProductWithCommentDTO selectWithComment(Integer productId) {
+    public ProductWithCommentDTO getProductWithComment(Integer productId) {
         Product product = productRepository.findById(productId).orElseThrow();
+
         List<Comment> commentList = commentRepository.findByProductId(productId);
         int totalCommentCount = commentList.size();
         double sumOfRating = commentList.stream().map(Comment::getRating).reduce(0.0, Double::sum);
-        List<OrderDetail> orderDetailList = orderDetailRepository.findAllByProduct_Id(productId);
+
+        List<OrderDetail> orderDetailList = orderDetailRepository.findAllByProductId(productId);
         int totalSells = orderDetailList.stream().map(OrderDetail::getQuantity).reduce(0, Integer::sum);
+
         double averageStars = 0.0;
         if (totalCommentCount > 0) {
             averageStars = sumOfRating / totalCommentCount;
         }
 
-        List<CommentInfoDTO> commentInfoList = commentList.stream()
-                .map(comment -> {
-                    User user = userRepository.findById(comment.getUserId()).orElse(null);
-                    String userName = (user != null) ? user.getName() : "Unknown User";
-                    return commentMapper.convertToCommentInfo(comment, userName);
-                })
+        List<CommentResponseDTO> commentInfoList = commentList.stream()
+                .map(commentMapper::convertToCommentResponseDTO)
                 .collect(Collectors.toList());
 
-        ProductWithCommentDTO dto = ProductWithCommentDTO
+        return ProductWithCommentDTO
                 .builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -89,6 +82,5 @@ public class ProductServiceImpl implements ProductService {
                 .averageStars(averageStars)
                 .comments(commentInfoList)
                 .build();
-        return dto;
     }
 }

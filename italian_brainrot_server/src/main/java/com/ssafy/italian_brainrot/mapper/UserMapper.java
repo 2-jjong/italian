@@ -5,6 +5,7 @@ import com.ssafy.italian_brainrot.dto.user.GradeDTO;
 import com.ssafy.italian_brainrot.dto.user.UserRequestDTO;
 import com.ssafy.italian_brainrot.dto.user.UserResponseDTO;
 import com.ssafy.italian_brainrot.entity.User;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,6 +28,7 @@ public class UserMapper {
                 .build();
     }
 
+    @Getter
     private enum Level {
         SEED("씨앗", 10, 50, "seeds.png"),
         FLOWER("꽃", 15, 125, "flower.png"),
@@ -45,16 +47,11 @@ public class UserMapper {
             this.max = max;
             this.img = img;
         }
-
-        public String getTitle() { return title; }
-        public int getUnit() { return unit; }
-        public int getMax() { return max; }
-        public String getImg() { return img; }
     }
 
     private GradeDTO calculateGrade(int stamps) {
         int level = 0;
-        int remain = 11;
+        int remain;
         int step = 0;
         Level[] levels = Level.values();
 

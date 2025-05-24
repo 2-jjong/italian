@@ -7,7 +7,9 @@ import java.util.List;
 
 
 public interface ProductService {
+
     List<ProductDTO> getProductList();
 
-    ProductWithCommentDTO selectWithComment(Integer productId);
+    ProductWithCommentDTO getProductWithComment(Integer productId);
+
 }

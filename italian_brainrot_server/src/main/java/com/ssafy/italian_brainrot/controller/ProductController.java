@@ -15,23 +15,19 @@ public class ProductController {
 
     private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
-    private final ProductService service;
+    private final ProductService productService;
 
     public ProductController(ProductService productService) {
-        this.service = productService;
+        this.productService = productService;
     }
 
     @GetMapping("")
-    public List<ProductDTO> productlist() {
-        List<ProductDTO> list = service.getProductList();
-        return list;
+    public List<ProductDTO> getProductlist() {
+        return productService.getProductList();
     }
 
     @GetMapping("/{productId}")
-    public ProductWithCommentDTO searchProductDetail(@PathVariable String productId) {
-        int id = Integer.parseInt(productId);
-        ProductWithCommentDTO productWithComment = service.selectWithComment(id);
-        log.debug(productWithComment.toString());
-        return productWithComment;
+    public ProductWithCommentDTO getProductWithComment(@PathVariable("productId") int productId) {
+        return productService.getProductWithComment(productId);
     }
 }

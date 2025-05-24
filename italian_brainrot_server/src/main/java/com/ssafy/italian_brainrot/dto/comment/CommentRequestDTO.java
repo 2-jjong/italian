@@ -9,8 +9,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentRequestDTO {
-    private int id;
-    private int productId;
-    private double rating;
-    private String comment;
+	private int id;
+	private String userId;
+	private int productId;
+	private double rating;
+	private String comment;
 }

@@ -15,16 +15,17 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
     private final UserService userService;
     private final CookieUtil cookieUtil;
-    private final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private final Logger log = LoggerFactory.getLogger(UserController.class);
 
     public UserController(UserService userService, CookieUtil cookieUtil) {
         this.userService = userService;
         this.cookieUtil = cookieUtil;
     }
 
-    @PostMapping
+    @PostMapping("")
     public Boolean join(@RequestBody UserRequestDTO user) {
         return userService.join(user);
     }
@@ -46,8 +47,13 @@ public class UserController {
         return true;
     }
 
-    @GetMapping
-    public UserResponseDTO getUserInfo(HttpServletRequest request) {
+    @GetMapping("/isUsed/{id}")
+    public Boolean isUsed(@PathVariable("id") String id) {
+        return userService.isUsedId(id);
+    }
+
+    @GetMapping("")
+    public UserResponseDTO getUser(HttpServletRequest request) {
         String userId = cookieUtil.getUserIdFromCookie(request);
         if (userId == null) {
             return null;
@@ -56,22 +62,15 @@ public class UserController {
         return userService.getUserById(userId);
     }
 
-    @GetMapping("/isUsed/{id}")
-    public Boolean isUsed(@PathVariable("id") String id) {
-        return userService.isUsedId(id);
-    }
-
     @PostMapping("/token")
     public String updateFcmToken(@RequestBody Map<String, String> request, HttpServletRequest httpRequest) {
-        String userId = getUserIdFromCookie(httpRequest);
+        String userId = cookieUtil.getUserIdFromCookie(httpRequest);
         if (userId == null) {
-            logger.warn("FCM 토큰 업데이트 실패: 로그인이 필요함");
             return null;
         }
 
         String fcmToken = request.get("fcmToken");
         if (fcmToken == null || fcmToken.trim().isEmpty()) {
-            logger.warn("FCM 토큰 업데이트 실패: 토큰이 비어있음");
             return null;
         }
 
@@ -80,22 +79,17 @@ public class UserController {
 
     @PutMapping("/point")
     public Integer chargePoint(@RequestBody Map<String, Integer> request, HttpServletRequest httpRequest) {
-        String userId = getUserIdFromCookie(httpRequest);
+        String userId = cookieUtil.getUserIdFromCookie(httpRequest);
         if (userId == null) {
-            logger.warn("포인트 충전 실패: 로그인이 필요함");
             return -1;
         }
 
         Integer point = request.get("point");
         if (point == null || point <= 0) {
-            logger.warn("포인트 충전 실패: 유효하지 않은 포인트 값 - {}", point);
             return -1;
         }
 
         return userService.chargePoint(userId, point);
     }
 
-    private String getUserIdFromCookie(HttpServletRequest request) {
-        return cookieUtil.getUserIdFromCookie(request);
-    }
 }

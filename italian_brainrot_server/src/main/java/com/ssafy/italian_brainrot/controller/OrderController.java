@@ -16,26 +16,20 @@ import java.util.List;
 @RequestMapping("/order")
 public class OrderController {
 
-    private static final Logger log = LoggerFactory.getLogger(OrderController.class);
     private final OrderService orderService;
     private final CookieUtil cookieUtil;
+    private final Logger log = LoggerFactory.getLogger(OrderController.class);
 
     public OrderController(OrderService orderService, CookieUtil cookieUtil) {
         this.orderService = orderService;
         this.cookieUtil = cookieUtil;
     }
 
-    /**
-     * 상품 주문
-     * POST /order
-     */
     @PostMapping
     public ResponseEntity<Integer> makeOrder(@RequestBody OrderDTO orderDTO, HttpServletRequest request) {
-        // Interceptor에서 이미 인증 체크했으므로 userId 추출하여 설정
         String userId = cookieUtil.getUserIdFromRequest(request);
         orderDTO.setUserId(userId);
 
-        // 기본 유효성 검사
         if (orderDTO.getDetails() == null || orderDTO.getDetails().isEmpty()) {
             log.warn("주문 실패: 주문 상세가 없음 - userId: {}", userId);
             return ResponseEntity.badRequest().body(-1);
