@@ -20,9 +20,6 @@ import java.util.Random;
 
 @Service
 public class GptBattleService {
-
-    private static final Logger logger = LoggerFactory.getLogger(GptBattleService.class);
-
     @Value("${openai.api.key}")
     private String apiKey;
 
@@ -34,6 +31,7 @@ public class GptBattleService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Logger log = LoggerFactory.getLogger(GptBattleService.class);
     private final Random random = new Random();
 
     // 등급 매핑 (낮은 숫자가 높은 등급)
@@ -60,7 +58,7 @@ public class GptBattleService {
 
             return Map.of("winner", winner, "content", battleContent);
         } catch (Exception e) {
-            logger.error("GPT 배틀 처리 중 오류 발생: {} vs {}", userId1, userId2, e);
+            log.error("GPT 배틀 처리 중 오류 발생: {} vs {}", userId1, userId2, e);
             return null;
         }
     }
@@ -120,17 +118,17 @@ public class GptBattleService {
                 JsonNode jsonNode = objectMapper.readTree(response.getBody());
                 String content = jsonNode.path("choices").get(0).path("message").path("content").asText();
 
-                logger.debug("GPT 배틀 결과 생성 완료: winner={}, content length={}",
+                log.debug("GPT 배틀 결과 생성 완료: winner={}, content length={}",
                         winnerUserId, content.length());
 
                 return content.trim();
             } else {
-                logger.warn("GPT API 호출 실패: {}", response.getStatusCode());
+                log.warn("GPT API 호출 실패: {}", response.getStatusCode());
                 throw new RuntimeException("GPT API 호출 실패");
             }
 
         } catch (Exception e) {
-            logger.error("GPT API 호출 중 오류 발생", e);
+            log.error("GPT API 호출 중 오류 발생", e);
             throw new RuntimeException("GPT API 호출 오류", e);
         }
     }

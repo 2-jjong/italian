@@ -12,7 +12,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/card")
 public class CardController {
-
     private final CardService cardService;
     private static final Logger log = LoggerFactory.getLogger(CardController.class);
 
@@ -39,5 +38,4 @@ public class CardController {
     public List<CharacterCardDTO> getAllCharacterCards() {
         return cardService.getAllCharacterCards();
     }
-
 }

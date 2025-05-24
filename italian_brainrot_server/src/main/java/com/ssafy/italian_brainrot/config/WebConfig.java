@@ -1,4 +1,3 @@
-
 package com.ssafy.italian_brainrot.config;
 
 import com.ssafy.italian_brainrot.interceptor.AuthInterceptor;

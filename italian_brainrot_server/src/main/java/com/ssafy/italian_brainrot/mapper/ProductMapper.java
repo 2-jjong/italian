@@ -16,16 +16,4 @@ public class ProductMapper {
                 .img(entity.getImg())
                 .build();
     }
-
-    public Product convertToProduct(ProductDTO dto) {
-        Product entity = Product
-                .builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .type(dto.getType())
-                .price(dto.getPrice())
-                .img(dto.getImg())
-                .build();
-        return entity;
-    }
 }

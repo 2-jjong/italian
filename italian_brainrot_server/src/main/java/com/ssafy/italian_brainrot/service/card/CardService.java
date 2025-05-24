@@ -1,4 +1,3 @@
-
 package com.ssafy.italian_brainrot.service.card;
 
 import com.ssafy.italian_brainrot.dto.card.CharacterCardDTO;

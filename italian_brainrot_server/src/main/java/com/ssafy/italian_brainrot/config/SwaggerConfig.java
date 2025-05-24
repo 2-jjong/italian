@@ -1,4 +1,3 @@
-
 package com.ssafy.italian_brainrot.config;
 
 import io.swagger.v3.oas.models.OpenAPI;

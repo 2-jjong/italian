@@ -15,7 +15,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-
     private final UserService userService;
     private final CookieUtil cookieUtil;
     private final Logger log = LoggerFactory.getLogger(UserController.class);
@@ -91,5 +90,4 @@ public class UserController {
 
         return userService.chargePoint(userId, point);
     }
-
 }

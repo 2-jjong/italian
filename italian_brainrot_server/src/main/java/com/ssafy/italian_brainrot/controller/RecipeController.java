@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/recipe")
 public class RecipeController {
-
     private final RecipeService recipeService;
     private final CookieUtil cookieUtil;
     private final Logger log = LoggerFactory.getLogger(RecipeController.class);
@@ -30,5 +29,4 @@ public class RecipeController {
 
         return recipeService.craftCard(userId, request.getRecipeId());
     }
-
 }

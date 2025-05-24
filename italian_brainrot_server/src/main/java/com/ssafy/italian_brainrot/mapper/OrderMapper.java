@@ -13,7 +13,6 @@ import java.util.List;
 
 @Component
 public class OrderMapper {
-
     public Order convertToOrder(OrderDTO orderDTO) {
         return Order.builder()
                 .user(User.builder().id(orderDTO.getUserId()).build())
@@ -57,7 +56,7 @@ public class OrderMapper {
                     .orderId(orderDetail.getOrder().getId())
                     .productId(orderDetail.getProduct().getId())
                     .quantity(orderDetail.getQuantity())
-                    .type(orderDetail.getProduct().getType()) // Product에서 type 가져오기
+                    .type(orderDetail.getProduct().getType())
                     .build();
             orderDetailDTOList.add(dto);
         }

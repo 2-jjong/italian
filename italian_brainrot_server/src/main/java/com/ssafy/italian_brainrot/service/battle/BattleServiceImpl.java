@@ -22,7 +22,6 @@ import java.util.Map;
 
 @Service
 public class BattleServiceImpl implements BattleService {
-
     private final BattleRepository battleRepository;
     private final CharacterCardRepository characterCardRepository;
     private final BattleMapper battleMapper;
@@ -236,5 +235,4 @@ public class BattleServiceImpl implements BattleService {
             logger.error("지연된 배틀 처리 실패: battleId={}", battle.getId(), e);
         }
     }
-
 }

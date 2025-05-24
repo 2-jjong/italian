@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class BattleMapper {
-
     public BattleDTO convertToBattleDTO(Battle entity) {
         return BattleDTO.builder()
                 .id(entity.getId())
@@ -29,5 +28,4 @@ public class BattleMapper {
                 .map(this::convertToBattleDTO)
                 .collect(Collectors.toList());
     }
-
 }

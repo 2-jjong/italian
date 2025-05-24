@@ -3,7 +3,6 @@ package com.ssafy.italian_brainrot.dto.battle;
 import com.ssafy.italian_brainrot.enumerate.BattleState;
 import lombok.*;
 
-
 @Getter
 @Setter
 @ToString

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BattleScheduler {
-
     private final BattleService battleService;
     private final Logger logger = LoggerFactory.getLogger(BattleScheduler.class);
 

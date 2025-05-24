@@ -26,5 +26,4 @@ public class RecipeIngredientId implements Serializable {
     public int hashCode() {
         return Objects.hash(resourceCard, recipe);
     }
-
 }

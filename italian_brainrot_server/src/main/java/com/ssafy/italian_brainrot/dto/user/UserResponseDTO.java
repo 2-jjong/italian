@@ -1,4 +1,3 @@
-
 package com.ssafy.italian_brainrot.dto.user;
 
 import lombok.*;

@@ -12,21 +12,17 @@ import java.util.stream.Collectors;
 
 @Component
 public class CardMapper {
-
     public ResourceCardDTO convertToResourceCardDTO(ResourceCard entity, List<Integer> craftableCharacterCardIds) {
         ResourceCardDTO dto = new ResourceCardDTO();
 
-        // 부모 필드 설정
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setContent(entity.getContent());
         dto.setImagePath(entity.getImg());
 
-        // 자식 필드 설정
         dto.setProduct_id(entity.getProduct().getId());
         dto.setExpected_probability(entity.getExpectedProbability());
 
-        // Service에서 전달받은 데이터 설정
         dto.setCraftableCharacterCardIds(craftableCharacterCardIds);
 
         return dto;
@@ -35,18 +31,15 @@ public class CardMapper {
     public CharacterCardDTO convertToCharacterCardDTO(CharacterCard entity, Map<Integer, Integer> requiredResourceCards) {
         CharacterCardDTO dto = new CharacterCardDTO();
 
-        // 부모 필드 설정
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setContent(entity.getContent());
         dto.setImagePath(entity.getImg());
 
-        // 자식 필드 설정
         dto.setGrade(entity.getGrade());
         dto.setVoicePath(entity.getVoice());
         dto.setExpectedProbability(entity.getExpectedProbability());
 
-        // Service에서 전달받은 데이터 설정
         dto.setRequiredResourceCards(requiredResourceCards);
 
         return dto;

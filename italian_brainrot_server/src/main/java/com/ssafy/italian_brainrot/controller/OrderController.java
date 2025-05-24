@@ -13,7 +13,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/order")
 public class OrderController {
-
     private final OrderService orderService;
     private final CookieUtil cookieUtil;
     private final Logger log = LoggerFactory.getLogger(OrderController.class);
@@ -39,5 +38,4 @@ public class OrderController {
 
         return orderService.getOrderHistory(userId, recentMonths);
     }
-
 }

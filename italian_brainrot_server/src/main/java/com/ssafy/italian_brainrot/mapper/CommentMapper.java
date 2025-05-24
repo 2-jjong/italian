@@ -9,7 +9,6 @@ import com.ssafy.italian_brainrot.entity.Comment;
 
 @Component
 public class CommentMapper {
-
 	public Comment convertToComment(CommentRequestDTO dto) {
 		return Comment.builder()
 				.id(dto.getId())
@@ -17,15 +16,6 @@ public class CommentMapper {
 				.productId(dto.getProductId())
 				.rating(dto.getRating())
 				.comment(dto.getComment())
-				.build();
-	}
-
-	public CommentRequestDTO convertToCommentRequestDTO(Comment entity) {
-        return CommentRequestDTO.builder()
-				.id(entity.getId())
-				.productId(entity.getProductId())
-				.rating(entity.getRating())
-				.comment(entity.getComment())
 				.build();
 	}
 
@@ -39,5 +29,4 @@ public class CommentMapper {
 				.comment(entity.getComment())
 				.build();
 	}
-
 }

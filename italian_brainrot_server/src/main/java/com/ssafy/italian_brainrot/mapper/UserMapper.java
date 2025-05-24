@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
-
     public User convertToUser(UserRequestDTO userRequestDTO) {
         return User.builder()
                 .id(userRequestDTO.getId())
