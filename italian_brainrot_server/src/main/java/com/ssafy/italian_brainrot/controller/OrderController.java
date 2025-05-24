@@ -1,9 +1,13 @@
 package com.ssafy.italian_brainrot.controller;
 
 import com.ssafy.italian_brainrot.dto.order.OrderDTO;
-import com.ssafy.italian_brainrot.dto.order.OrderDetailDTO;
-import com.ssafy.italian_brainrot.dto.order.OrderInfoDTO;
 import com.ssafy.italian_brainrot.service.order.OrderService;
+import com.ssafy.italian_brainrot.util.CookieUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,44 +16,73 @@ import java.util.List;
 @RequestMapping("/order")
 public class OrderController {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderController.class);
     private final OrderService orderService;
+    private final CookieUtil cookieUtil;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, CookieUtil cookieUtil) {
         this.orderService = orderService;
+        this.cookieUtil = cookieUtil;
     }
 
+    /**
+     * 상품 주문
+     * POST /order
+     */
     @PostMapping
-    public int makeOrder(@RequestBody OrderDTO orderDTO) {
+    public ResponseEntity<Integer> makeOrder(@RequestBody OrderDTO orderDTO, HttpServletRequest request) {
+        // Interceptor에서 이미 인증 체크했으므로 userId 추출하여 설정
+        String userId = cookieUtil.getUserIdFromRequest(request);
+        orderDTO.setUserId(userId);
+
+        // 기본 유효성 검사
         if (orderDTO.getDetails() == null || orderDTO.getDetails().isEmpty()) {
-            return -1;
+            log.warn("주문 실패: 주문 상세가 없음 - userId: {}", userId);
+            return ResponseEntity.badRequest().body(-1);
         }
 
-        if(orderDTO.getDetails().size() > 5)
-            return -2;
-
-        for (OrderDetailDTO detailDTO : orderDTO.getDetails()) {
-            if (detailDTO.getQuantity() < 0 || detailDTO.getQuantity() > 10)
-                return -3;
+        if (orderDTO.getDetails().size() > 5) {
+            log.warn("주문 실패: 주문 상세 개수 초과 - userId: {}, count: {}", userId, orderDTO.getDetails().size());
+            return ResponseEntity.badRequest().body(-2);
         }
 
-        orderService.makeOrder(orderDTO);
+        // 수량 유효성 검사
+        for (var detail : orderDTO.getDetails()) {
+            if (detail.getQuantity() < 0 || detail.getQuantity() > 10) {
+                log.warn("주문 실패: 잘못된 수량 - userId: {}, quantity: {}", userId, detail.getQuantity());
+                return ResponseEntity.badRequest().body(-3);
+            }
+        }
 
-        return orderDTO.getId();
+        // 주문 처리
+        Boolean success = orderService.makeOrder(orderDTO);
+
+        if (success) {
+            log.debug("주문 성공 - userId: {}, totalPrice: {}", userId, orderDTO.getTotalPrice());
+            return ResponseEntity.ok(orderDTO.getId());
+        } else {
+            log.warn("주문 실패 - userId: {}, totalPrice: {}", userId, orderDTO.getTotalPrice());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(-4);
+        }
     }
 
-    @GetMapping("/{orderId}")
-    public OrderInfoDTO getOrderInfo(@PathVariable int orderId) {
-        return orderService.getOrderInfo(orderId);
-    }
+    /**
+     * 주문 내역 조회
+     * GET /order/history?recentMonths={Int}
+     */
+    @GetMapping("/history")
+    public ResponseEntity<List<OrderDTO>> getOrderHistory(
+            @RequestParam(value = "recentMonths", required = false) Integer recentMonths,
+            HttpServletRequest request) {
 
-    @GetMapping("/byUser")
-    public List<OrderDTO> getLastMonthOrder(String id) {
-        return orderService.getLastMonthOrder(id);
-    }
+        // Interceptor에서 이미 인증 체크했으므로 userId 추출
+        String userId = cookieUtil.getUserIdFromRequest(request);
 
-    @GetMapping("/byUserIn6Months")
-    public List<OrderDTO> getLast6MonthOrder(String id) {
-        return orderService.getLast6MonthOrder(id);
-    }
+        List<OrderDTO> orderHistory = orderService.getOrderHistory(userId, recentMonths);
 
+        String period = recentMonths != null ? recentMonths + "개월" : "전체";
+        log.debug("주문 내역 조회 완료 - userId: {}, 기간: {}, 결과: {}건", userId, period, orderHistory.size());
+
+        return ResponseEntity.ok(orderHistory);
+    }
 }

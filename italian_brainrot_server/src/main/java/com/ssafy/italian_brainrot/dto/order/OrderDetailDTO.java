@@ -1,5 +1,6 @@
 package com.ssafy.italian_brainrot.dto.order;
 
+import com.ssafy.italian_brainrot.enumerate.InventoryItemType;
 import lombok.*;
 
 @Getter
@@ -13,4 +14,5 @@ public class OrderDetailDTO {
     private int orderId;
     private int productId;
     private int quantity;
+    private InventoryItemType type;
 }

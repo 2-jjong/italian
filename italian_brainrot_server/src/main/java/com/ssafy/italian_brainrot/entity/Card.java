@@ -1,8 +1,8 @@
 package com.ssafy.italian_brainrot.entity;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "t_card")
@@ -12,6 +12,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
+@SuperBuilder
 public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

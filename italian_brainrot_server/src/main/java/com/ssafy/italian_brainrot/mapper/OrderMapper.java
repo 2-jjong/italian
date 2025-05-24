@@ -2,8 +2,6 @@ package com.ssafy.italian_brainrot.mapper;
 
 import com.ssafy.italian_brainrot.dto.order.OrderDTO;
 import com.ssafy.italian_brainrot.dto.order.OrderDetailDTO;
-import com.ssafy.italian_brainrot.dto.order.OrderDetailInfoDTO;
-import com.ssafy.italian_brainrot.dto.order.OrderInfoDTO;
 import com.ssafy.italian_brainrot.entity.Order;
 import com.ssafy.italian_brainrot.entity.OrderDetail;
 import com.ssafy.italian_brainrot.entity.Product;
@@ -16,13 +14,15 @@ import java.util.List;
 @Component
 public class OrderMapper {
 
-    public Order convertOrder(OrderDTO orderDTO) {
+    public Order convertToOrder(OrderDTO orderDTO) {
         return Order.builder()
                 .user(User.builder().id(orderDTO.getUserId()).build())
+                .totalPrice(orderDTO.getTotalPrice())
+                .timeStamp(orderDTO.getTimeStamp())
                 .build();
     }
 
-    public OrderDetail convertOrderDetail(OrderDetailDTO orderDetailDTO, Order order) {
+    public OrderDetail convertToOrderDetail(OrderDetailDTO orderDetailDTO, Order order) {
         return OrderDetail.builder()
                 .order(order)
                 .product(Product.builder().id(orderDetailDTO.getProductId()).build())
@@ -30,43 +30,26 @@ public class OrderMapper {
                 .build();
     }
 
-    public OrderDTO convertOrderDTO(Order order) {
+    public OrderDTO convertToOrderDTO(Order order) {
         return OrderDTO.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
-                .details(convertOrderDetailDTOList(order.getDetails()))
+                .details(convertToOrderDetailDTOList(order.getDetails()))
+                .totalPrice(order.getTotalPrice())
+                .timeStamp(order.getTimeStamp())
                 .build();
     }
 
-    public OrderInfoDTO convertOrderInfoDTO(Order order) {
-        return OrderInfoDTO.builder()
-                .id(order.getId())
-                .userId(order.getUser().getId())
-                .details(convertOrderDetailInfoDTOList(order.getDetails()))
-                .build();
-    }
-
-    public List<OrderDTO> convertOrderDTOList(List<Order> orders) {
+    public List<OrderDTO> convertToOrderDTOList(List<Order> orders) {
         List<OrderDTO> orderDTOList = new ArrayList<>();
         for(Order order : orders) {
-            OrderDTO dto = convertOrderDTO(order);
+            OrderDTO dto = convertToOrderDTO(order);
             orderDTOList.add(dto);
         }
-
         return orderDTOList;
     }
 
-    public List<OrderInfoDTO> convertOrderInfoDTOList(List<Order> orders) {
-        List<OrderInfoDTO> orderInfoDTOList = new ArrayList<>();
-        for(Order order : orders) {
-            OrderInfoDTO dto = convertOrderInfoDTO(order);
-            orderInfoDTOList.add(dto);
-        }
-
-        return orderInfoDTOList;
-    }
-
-    private List<OrderDetailDTO> convertOrderDetailDTOList(List<OrderDetail> orderDetailList) {
+    private List<OrderDetailDTO> convertToOrderDetailDTOList(List<OrderDetail> orderDetailList) {
         List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
         for (OrderDetail orderDetail : orderDetailList) {
             OrderDetailDTO dto = OrderDetailDTO.builder()
@@ -74,31 +57,10 @@ public class OrderMapper {
                     .orderId(orderDetail.getOrder().getId())
                     .productId(orderDetail.getProduct().getId())
                     .quantity(orderDetail.getQuantity())
+                    .type(orderDetail.getProduct().getType()) // Product에서 type 가져오기
                     .build();
             orderDetailDTOList.add(dto);
         }
-
         return orderDetailDTOList;
     }
-
-    private List<OrderDetailInfoDTO> convertOrderDetailInfoDTOList(List<OrderDetail> orderDetailList) {
-        List<OrderDetailInfoDTO> orderDetailInfoDTOList = new ArrayList<>();
-        for (OrderDetail orderDetail : orderDetailList) {
-            OrderDetailInfoDTO dto = OrderDetailInfoDTO.builder()
-                    .id((int) orderDetail.getId())
-                    .orderId(orderDetail.getOrder().getId())
-                    .productId(orderDetail.getProduct().getId())
-                    .quantity(orderDetail.getQuantity())
-                    .img(orderDetail.getProduct().getImg())
-                    .name(orderDetail.getProduct().getName())
-                    .type(orderDetail.getProduct().getType())
-                    .unitPrice(orderDetail.getProduct().getPrice())
-                    .sumPrice(orderDetail.getProduct().getPrice() * orderDetail.getQuantity())
-                    .build();
-            orderDetailInfoDTOList.add(dto);
-        }
-
-        return orderDetailInfoDTOList;
-    }
-
 }

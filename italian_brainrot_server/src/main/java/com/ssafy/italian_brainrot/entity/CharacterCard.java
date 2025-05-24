@@ -2,6 +2,7 @@ package com.ssafy.italian_brainrot.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "t_character_card")
@@ -11,7 +12,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-@Builder
+@SuperBuilder
 public class CharacterCard extends Card {
     @Column(length = 10, nullable = false)
     private String grade;

@@ -1,9 +1,10 @@
+
 package com.ssafy.italian_brainrot.entity;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -25,4 +26,11 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderDetail> details;
+
+    @Column(name = "total_price", nullable = false)
+    private int totalPrice;
+
+    @Builder.Default
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime timeStamp = LocalDateTime.now();
 }
