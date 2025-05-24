@@ -1,7 +1,7 @@
 package com.ssafy.italian_brainrot.service.user;
 
 import com.ssafy.italian_brainrot.dto.user.UserRequestDTO;
-import com.ssafy.italian_brainrot.entity.User;
+import com.ssafy.italian_brainrot.dto.user.UserResponseDTO;
 
 public interface UserService {
 
@@ -18,9 +18,9 @@ public interface UserService {
      *
      * @param id
      * @param pass
-     * @return 조회된 User 정보를 반환한다.
+     * @return 조회된 결과를 반환한다.
      */
-    public User login(String id, String pass);
+    public boolean login(String id, String pass);
 
     /**
      * 해당 아이디가 이미 사용 중인지를 반환한다.
@@ -36,6 +36,23 @@ public interface UserService {
      * @param id
      * @return 조회된 User 정보를 반환한다.
      */
-    public User selectUser(String id);
+    public UserResponseDTO getUserById(String id);
 
+    /**
+     * 사용자의 FCM 토큰을 업데이트한다.
+     *
+     * @param userId
+     * @param fcmToken
+     * @return 저장된 FCM 토큰
+     */
+    public String updateFcmToken(String userId, String fcmToken);
+
+    /**
+     * 사용자의 포인트를 충전한다.
+     *
+     * @param userId
+     * @param point
+     * @return 반영된 포인트
+     */
+    public int chargePoint(String userId, int point);
 }

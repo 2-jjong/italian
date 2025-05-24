@@ -1,39 +1,58 @@
 package com.ssafy.italian_brainrot.service.product;
 
 
+import com.ssafy.italian_brainrot.dto.comment.CommentInfoDTO;
 import com.ssafy.italian_brainrot.dto.product.ProductDTO;
 import com.ssafy.italian_brainrot.dto.product.ProductWithCommentDTO;
 import com.ssafy.italian_brainrot.entity.Comment;
 import com.ssafy.italian_brainrot.entity.OrderDetail;
 import com.ssafy.italian_brainrot.entity.Product;
+import com.ssafy.italian_brainrot.entity.User;
+import com.ssafy.italian_brainrot.mapper.CommentMapper;
 import com.ssafy.italian_brainrot.mapper.ProductMapper;
 import com.ssafy.italian_brainrot.repository.CommentRepository;
 import com.ssafy.italian_brainrot.repository.OrderDetailRepository;
 import com.ssafy.italian_brainrot.repository.ProductRepository;
+import com.ssafy.italian_brainrot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
 
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
-    @Autowired
-    private ProductMapper productMapper;
+    private final UserRepository userRepository;
+
+    private final ProductMapper productMapper;
+
+    private final CommentMapper commentMapper;
+
+    public ProductServiceImpl(ProductRepository productRepository,
+                              CommentRepository commentRepository,
+                              OrderDetailRepository orderDetailRepository,
+                              UserRepository userRepository,
+                              ProductMapper productMapper,
+                              CommentMapper commentMapper) {
+        this.productRepository = productRepository;
+        this.commentRepository = commentRepository;
+        this.orderDetailRepository = orderDetailRepository;
+        this.userRepository = userRepository;
+        this.productMapper = productMapper;
+        this.commentMapper = commentMapper;
+    }
 
     @Override
     public List<ProductDTO> getProductList() {
         List<Product> entityList = productRepository.findAll();
-        List<ProductDTO> dtoList = entityList.stream().map((product) -> productMapper.convert(product)).toList();
+        List<ProductDTO> dtoList = entityList.stream().map((product) -> productMapper.convertToProductDTO(product)).toList();
         return dtoList;
     }
 
@@ -49,6 +68,15 @@ public class ProductServiceImpl implements ProductService {
         if (totalCommentCount > 0) {
             averageStars = sumOfRating / totalCommentCount;
         }
+
+        List<CommentInfoDTO> commentInfoList = commentList.stream()
+                .map(comment -> {
+                    User user = userRepository.findById(comment.getUserId()).orElse(null);
+                    String userName = (user != null) ? user.getName() : "Unknown User";
+                    return commentMapper.convertToCommentInfo(comment, userName);
+                })
+                .collect(Collectors.toList());
+
         ProductWithCommentDTO dto = ProductWithCommentDTO
                 .builder()
                 .id(product.getId())
@@ -59,6 +87,7 @@ public class ProductServiceImpl implements ProductService {
                 .commentCount(totalCommentCount)
                 .totalSells(totalSells)
                 .averageStars(averageStars)
+                .comments(commentInfoList)
                 .build();
         return dto;
     }

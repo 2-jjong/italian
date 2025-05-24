@@ -19,24 +19,24 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	public CommentDTO addComment(CommentDTO comment) {
-		Comment newEntity = mapper.convert(comment);
+		Comment newEntity = mapper.convertToComment(comment);
 		Comment entity = repository.save(newEntity);
-		CommentDTO dto = mapper.convert(entity);
+		CommentDTO dto = mapper.convertToCommentDTO(entity);
 		return dto;
 	}
 
 	@Override
 	public CommentDTO selectComment(Integer id) {
 		Comment entity = repository.findById(id).orElseThrow();
-		CommentDTO dto = mapper.convert(entity);
+		CommentDTO dto = mapper.convertToCommentDTO(entity);
 		return dto;
 	}
 
 	@Override
 	public CommentDTO updateComment(CommentDTO comment) {
-		Comment updatedEntity = mapper.convert(comment);
+		Comment updatedEntity = mapper.convertToComment(comment);
 		Comment entity = repository.save(updatedEntity);
-		CommentDTO dto = mapper.convert(entity);
+		CommentDTO dto = mapper.convertToCommentDTO(entity);
 		return dto;
 	}
 

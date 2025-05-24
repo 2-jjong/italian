@@ -1,9 +1,9 @@
 package com.ssafy.italian_brainrot.controller;
 
 import com.ssafy.italian_brainrot.dto.user.UserRequestDTO;
-import com.ssafy.italian_brainrot.entity.User;
+import com.ssafy.italian_brainrot.dto.user.UserResponseDTO;
 import com.ssafy.italian_brainrot.service.user.UserService;
-import io.swagger.v3.oas.annotations.Operation;
+import com.ssafy.italian_brainrot.util.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,11 +22,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    private final UserService userService;
+    private final UserService userService;// 기존 코드 호환을 위해 추가
+    private final CookieUtil cookieUtil;
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, CookieUtil cookieUtil) {
         this.userService = userService;
+        this.cookieUtil = cookieUtil;
     }
 
     @PostMapping
@@ -36,83 +37,30 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody UserRequestDTO user, HttpServletResponse response) {
-        User result = userService.login(user.getId(), user.getPass());
+    public Boolean login(@RequestBody UserRequestDTO user, HttpServletResponse response) {
+        boolean loginSuccess = userService.login(user.getId(), user.getPass());
 
-        // 쿠키 설정
-        if (result != null) {
-            Cookie cookie;
-            try {
-                cookie = new Cookie("loginId", URLEncoder.encode(result.getId(), "UTF-8"));
-                cookie.setMaxAge(60 * 5);
-                response.addCookie(cookie);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (loginSuccess) {
+            return cookieUtil.setLoginCookie(response, user.getId());
         }
 
-        return result;
+        return false;
     }
 
-    @PostMapping("/info")
-    public Map<String, Object> getUserInfo(@RequestBody UserRequestDTO user) {
-        Map<String, Object> map = new HashMap<>();
-
-        // user 조회
-        User resultUser = userService.login(user.getId(), user.getPass());
-
-        // user가 null이면 id, pass가 틀렸다는 뜻, null 반환
-        if (resultUser == null)
-            return null;
-
-        // user가 주문한 주문 내역들 조회
-//        List<Order> resultOrder = oService.getOrderByUser(user.getId());
-
-        map.put("user", resultUser);
-//        map.put("order", resultOrder);
-        map.put("grade", getGrade(resultUser.getStamps()));
-
-        return map;
+    @PostMapping("/logout")
+    public Boolean logout(HttpServletResponse response) {
+        cookieUtil.removeLoginCookie(response);
+        return true;
     }
 
-    @Operation(summary = "사용자 정보 조회", description = "관통 6단계(Android app)에서 사용된다.\n\n"
-            + "로그인 성공한 cookie 정보가 없으면 전체 null이 반환된다.\n\n")
-    @GetMapping("/info")
-    public Map<String, Object> getUserInfo2(@RequestParam String id, HttpServletRequest request) {
-        logger.debug("getUserInfo2: " + id);
-
-        Cookie[] cookies = request.getCookies();
-        boolean hasLoginCookie = false;
-
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("loginId".equals(cookie.getName()) && cookie.getValue() != null) {
-                    hasLoginCookie = true;
-                    break;
-                }
-            }
-        }
-
-        if (!hasLoginCookie) {
+    @GetMapping
+    public UserResponseDTO getUserInfo(HttpServletRequest request) {
+        String userId = getUserIdFromCookie(request);
+        if (userId == null) {
             return null;
         }
 
-        Map<String, Object> map = new HashMap<>();
-
-        User resultUser = userService.selectUser(id);
-
-        if (resultUser == null) {
-            return null;
-        }
-
-        // user가 주문한 주문 내역들 조회
-//        List<Order> resultOrder = oService.getOrderByUser(user.getId());
-
-        map.put("user", resultUser);
-//        map.put("order", resultOrder);
-        map.put("grade", getGrade(resultUser.getStamps()));
-
-        return map;
+        return userService.getUserById(userId);
     }
 
     @GetMapping("/isUsed/{id}")
@@ -120,16 +68,44 @@ public class UserController {
         return userService.isUsedId(id);
     }
 
-    /**
-     * 사용자 등급정보를 계산하여 리턴한다. 이미지가 seeds.png, 등급이 씨앗, step이 1, stepMax가 1, to가 7 이라면,
-     * 씨앗 1단계 등급의 사용자가 다음단계로 가려면 7개 더 모아야 함을 의미한다. img, step, stepMax, to, title이 각
-     * key가 되고, 각각의 key을 맞게 입력하여 리턴하면 된다.
-     *
-     * src/test/java에 있는 테스트 케이스를 통과하면 정상동작한다.
-     *
-     * @param stamp
-     * @return
-     */
+    @PostMapping("/token")
+    public String updateFcmToken(@RequestBody Map<String, String> request, HttpServletRequest httpRequest) {
+        String userId = getUserIdFromCookie(httpRequest);
+        if (userId == null) {
+            logger.warn("FCM 토큰 업데이트 실패: 로그인이 필요함");
+            return null;
+        }
+
+        String fcmToken = request.get("fcmToken");
+        if (fcmToken == null || fcmToken.trim().isEmpty()) {
+            logger.warn("FCM 토큰 업데이트 실패: 토큰이 비어있음");
+            return null;
+        }
+
+        return userService.updateFcmToken(userId, fcmToken);
+    }
+
+    @PutMapping("/point")
+    public Integer chargePoint(@RequestBody Map<String, Integer> request, HttpServletRequest httpRequest) {
+        String userId = getUserIdFromCookie(httpRequest);
+        if (userId == null) {
+            logger.warn("포인트 충전 실패: 로그인이 필요함");
+            return -1;
+        }
+
+        Integer point = request.get("point");
+        if (point == null || point <= 0) {
+            logger.warn("포인트 충전 실패: 유효하지 않은 포인트 값 - {}", point);
+            return -1;
+        }
+
+        return userService.chargePoint(userId, point);
+    }
+
+    private String getUserIdFromCookie(HttpServletRequest request) {
+        return cookieUtil.getUserIdFromRequest(request);
+    }
+
     public Map<String, Object> getGrade(Integer stamp) {
         Map<String, Object> grade = new HashMap<>();
         int level = 0;
@@ -164,7 +140,6 @@ public class UserController {
         }
         return grade;
     }
-
 }
 
 @Setter
