@@ -6,9 +6,9 @@ public interface CommentService {
 
 	CommentDTO addComment(CommentDTO comment);
 
-	CommentDTO selectComment(Integer id);
-
 	CommentDTO updateComment(CommentDTO comment);
 
-	boolean removeComment(Integer id);
+	boolean removeComment(Integer commentId, String userId);
+
+	CommentDTO selectComment(Integer id);
 }

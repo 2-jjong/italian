@@ -1,6 +1,7 @@
 package com.ssafy.italian_brainrot.mapper;
 
 import com.ssafy.italian_brainrot.dto.comment.CommentInfoDTO;
+import com.ssafy.italian_brainrot.dto.comment.CommentRequestDTO;
 import org.springframework.stereotype.Component;
 
 import com.ssafy.italian_brainrot.dto.comment.CommentDTO;
@@ -30,4 +31,5 @@ public class CommentMapper {
 				.userName(userName)
 				.build();
 	}
+
 }
