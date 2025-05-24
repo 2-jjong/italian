@@ -212,10 +212,7 @@ public class BattleServiceImpl implements BattleService {
             battleRepository.save(battle);
 
             // 결과 FCM 알림 전송
-            fcmService.sendBattleResultNotification(
-                    battle.getUserid1(), battle.getUserid2(),
-                    battle.getId(), (BattleState) result.get("winner")
-            );
+            fcmService.sendBattleResultNotification(battle.getUserid1(), battle.getUserid2(), battle.getId());
 
         } catch (Exception e) {
             logger.error("비동기 배틀 처리 중 오류 발생: battleId={}", battle.getId(), e);
@@ -233,10 +230,7 @@ public class BattleServiceImpl implements BattleService {
             battle.setContent((String) result.get("content"));
             battleRepository.save(battle);
 
-            fcmService.sendBattleResultNotification(
-                    battle.getUserid1(), battle.getUserid2(),
-                    battle.getId(), (BattleState) result.get("winner")
-            );
+            fcmService.sendBattleResultNotification(battle.getUserid1(), battle.getUserid2(), battle.getId());
 
         } catch (Exception e) {
             logger.error("지연된 배틀 처리 실패: battleId={}", battle.getId(), e);

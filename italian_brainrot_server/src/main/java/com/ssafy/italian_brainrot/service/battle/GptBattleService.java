@@ -15,7 +15,6 @@ import java.lang.constant.Constable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 @Service
 public class GptBattleService {
@@ -33,30 +32,22 @@ public class GptBattleService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final Random random = new Random();
 
     public Map<String, Constable> processBattle(String userId1, String userId2, Card user1Card, Card user2Card) {
         try {
             /*
-                TODO: GPT 반환 결과 Winner와 BattleContent 반환? 승자를 정해서 GPT 호출?
+                TODO: GPT 반환 결과 승자를 정해서 GPT 호출?
              */
-            // GPT API 호출
-            String battleContent = callGptApi(userId1, userId2, user1Card, user2Card);
 
             // 승자 결정
             BattleState winner = BattleState.USER1;
 
+            // GPT API 호출
+            String battleContent = callGptApi(userId1, userId2, user1Card, user2Card);
+
             return Map.of("winner", winner, "content", battleContent);
         } catch (Exception e) {
             logger.error("GPT 배틀 처리 중 오류 발생: {} vs {}", userId1, userId2, e);
-
-            // 실패 시 기본 결과 반환
-            BattleState winner = random.nextBoolean() ? BattleState.USER1 : BattleState.USER2;
-            String defaultContent = String.format("%s의 %s vs %s의 %s - 치열한 배틀 끝에 %s이(가) 승리했습니다!",
-                    userId1, user1Card.getName(),
-                    userId2, user2Card.getName(),
-                    winner == BattleState.USER1 ? userId1 : userId2);
-
             return null;
         }
     }
