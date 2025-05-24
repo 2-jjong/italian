@@ -1,4 +1,3 @@
-
 package com.ssafy.italian_brainrot.scheduler;
 
 import com.ssafy.italian_brainrot.service.battle.BattleService;
@@ -17,7 +16,7 @@ public class BattleScheduler {
         this.battleService = battleService;
     }
 
-    @Scheduled(fixedRate = 30000) // 30초마다 실행
+    @Scheduled(fixedRate = 60000) // 1분마다 실행
     public void cancelExpiredBattles() {
         try {
             battleService.cancelExpiredBattles();
@@ -26,7 +25,7 @@ public class BattleScheduler {
         }
     }
 
-    @Scheduled(fixedRate = 30000) // 30초마다 실행
+    @Scheduled(fixedRate = 60000) // 1분마다 실행
     public void processRunningBattles() {
         try {
             battleService.processRunningBattles();

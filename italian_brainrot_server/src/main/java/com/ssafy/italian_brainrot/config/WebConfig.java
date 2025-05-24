@@ -1,3 +1,4 @@
+
 package com.ssafy.italian_brainrot.config;
 
 import com.ssafy.italian_brainrot.interceptor.AuthInterceptor;
@@ -21,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns(
                         "/user/token",           // FCM 토큰 업데이트
                         "/user/point",           // 포인트 충전
-                        "/user/info",            // 사용자 정보 조회 (GET)
+                        "/user",                 // 사용자 정보 조회 (GET) - 수정됨
                         "/comment/**",           // 댓글 관련 모든 API
                         "/order/**",             // 주문 관련 모든 API
                         "/inventory/**",         // 인벤토리 관련 모든 API
@@ -33,7 +34,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/user",                 // 회원가입 (POST)
                         "/user/login",           // 로그인
+                        "/user/logout",          // 로그아웃
                         "/user/isUsed/**",       // 아이디 중복 확인
+                        "/product/**",           // 상품 조회 (인증 불필요)
                         "/swagger-ui/**",        // Swagger UI
                         "/v3/api-docs/**"        // API 문서
                 );
