@@ -4,21 +4,19 @@ package com.ssafy.italian_brainrot.scheduler;
 import com.ssafy.italian_brainrot.service.battle.BattleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BattleScheduler {
 
-    private static final Logger logger = LoggerFactory.getLogger(BattleScheduler.class);
+    private final BattleService battleService;
+    private final Logger logger = LoggerFactory.getLogger(BattleScheduler.class);
 
-    @Autowired
-    private BattleService battleService;
+    public BattleScheduler(final BattleService battleService) {
+        this.battleService = battleService;
+    }
 
-    /**
-     * 30초마다 만료된 WAITING 배틀 자동 취소
-     */
     @Scheduled(fixedRate = 30000) // 30초마다 실행
     public void cancelExpiredBattles() {
         try {
@@ -28,9 +26,6 @@ public class BattleScheduler {
         }
     }
 
-    /**
-     * 30초마다 RUNNING 배틀 결과 처리 확인
-     */
     @Scheduled(fixedRate = 30000) // 30초마다 실행
     public void processRunningBattles() {
         try {

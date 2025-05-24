@@ -11,6 +11,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.lang.constant.Constable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,21 +35,18 @@ public class GptBattleService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Random random = new Random();
 
-    /**
-     * GPT API를 호출하여 카드 배틀 결과 생성
-     */
-    public BattleResult processBattle(String userId1, String userId2, Card user1Card, Card user2Card) {
+    public Map<String, Constable> processBattle(String userId1, String userId2, Card user1Card, Card user2Card) {
         try {
+            /*
+                TODO: GPT 반환 결과 Winner와 BattleContent 반환? 승자를 정해서 GPT 호출?
+             */
             // GPT API 호출
             String battleContent = callGptApi(userId1, userId2, user1Card, user2Card);
 
-            // 승자 결정 (50:50 확률)
-            BattleState winner = random.nextBoolean() ? BattleState.USER1 : BattleState.USER2;
+            // 승자 결정
+            BattleState winner = BattleState.USER1;
 
-            logger.debug("GPT 배틀 완료: {} vs {}, 승자: {}", userId1, userId2, winner);
-
-            return new BattleResult(winner, battleContent);
-
+            return Map.of("winner", winner, "content", battleContent);
         } catch (Exception e) {
             logger.error("GPT 배틀 처리 중 오류 발생: {} vs {}", userId1, userId2, e);
 
@@ -59,13 +57,10 @@ public class GptBattleService {
                     userId2, user2Card.getName(),
                     winner == BattleState.USER1 ? userId1 : userId2);
 
-            return new BattleResult(winner, defaultContent);
+            return null;
         }
     }
 
-    /**
-     * OpenAI GPT API 호출
-     */
     private String callGptApi(String userId1, String userId2, Card user1Card, Card user2Card) {
         try {
             // HTTP 헤더 설정
@@ -73,13 +68,14 @@ public class GptBattleService {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(apiKey);
 
+            // TODO: Italian Brainrot의 게임 설정에 따라 요청 본문 수정
             // 요청 본문 생성
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("model", model);
             requestBody.put("messages", List.of(
-                    Map.of("role", "system", "content", "당신은 카드 게임의 배틀 해설자입니다. 두 카드의 배틀 상황을 재미있고 생생하게 묘사해주세요."),
+                    Map.of("role", "system", "content", "당신은 게임의 배틀 해설자입니다. 두 캐릭터의 배틀 상황을 재미있고 생생하게 묘사해주세요."),
                     Map.of("role", "user", "content", String.format(
-                            "%s의 카드 '%s' vs %s의 카드 '%s' 배틀을 150자 이내로 흥미롭게 묘사해주세요.",
+                            "%s의 캐릭터 '%s' vs %s의 캐릭터 '%s' 배틀을 150자 이내로 흥미롭게 묘사해주세요.",
                             userId1, user1Card.getName(), userId2, user2Card.getName()))
             ));
             requestBody.put("max_tokens", 200);
@@ -94,7 +90,6 @@ public class GptBattleService {
                 JsonNode jsonNode = objectMapper.readTree(response.getBody());
                 String content = jsonNode.path("choices").get(0).path("message").path("content").asText();
 
-                logger.debug("GPT API 호출 성공: {}", content);
                 return content.trim();
             } else {
                 logger.warn("GPT API 호출 실패: {}", response.getStatusCode());
@@ -107,24 +102,4 @@ public class GptBattleService {
         }
     }
 
-    /**
-     * 배틀 결과 클래스
-     */
-    public static class BattleResult {
-        private final BattleState winner;
-        private final String content;
-
-        public BattleResult(BattleState winner, String content) {
-            this.winner = winner;
-            this.content = content;
-        }
-
-        public BattleState getWinner() {
-            return winner;
-        }
-
-        public String getContent() {
-            return content;
-        }
-    }
 }

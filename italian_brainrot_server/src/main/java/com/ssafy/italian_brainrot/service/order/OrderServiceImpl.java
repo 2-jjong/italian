@@ -39,7 +39,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public Boolean makeOrder(OrderDTO orderDTO) {
+    public Boolean insertOrder(OrderDTO orderDTO) {
         try {
             // 1. 사용자 조회
             User user = userRepository.findById(orderDTO.getUserId()).orElse(null);
@@ -60,7 +60,6 @@ public class OrderServiceImpl implements OrderService {
 
             // 4. Order 생성
             Order order = orderMapper.convertToOrder(orderDTO);
-            order.setTimeStamp(LocalDateTime.now());
 
             // 5. OrderDetail 생성 및 인벤토리 추가
             List<OrderDetail> orderDetailList = new ArrayList<>();
@@ -72,12 +71,10 @@ public class OrderServiceImpl implements OrderService {
                 stampSum += orderDetail.getQuantity();
 
                 // 6. InventoryService를 통해 인벤토리에 아이템 추가
-                inventoryService.addItemToInventory(
-                        orderDTO.getUserId(),
-                        dto.getProductId(),
-                        dto.getQuantity(),
-                        dto.getType()
-                );
+                boolean isSuccess = inventoryService.InsertItemToInventory(orderDTO.getUserId(), dto.getProductId(), dto.getQuantity(), dto.getType());
+                if(!isSuccess){
+                    return false;
+                }
             }
 
             order.setDetails(orderDetailList);
@@ -97,8 +94,8 @@ public class OrderServiceImpl implements OrderService {
 
             log.debug("주문 생성 성공 - userId: {}, orderId: {}, totalPrice: {}, stamps: {}",
                     orderDTO.getUserId(), order.getId(), orderDTO.getTotalPrice(), stampSum);
-            return true;
 
+            return true;
         } catch (Exception e) {
             log.error("주문 생성 중 오류 발생: ", e);
             return false;
@@ -110,12 +107,11 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders;
 
         if (recentMonths == null) {
-            // 전체 조회
-            orders = orderRepository.findByUserId(userId);
+            orders = orderRepository.findByUserIdOrderByTimeStampDesc(userId);
             log.debug("전체 주문 내역 조회 - userId: {}, 결과: {}건", userId, orders.size());
         } else {
-            // 기간별 조회 (현재는 전체 조회로 구현, 실제로는 날짜 필터링 필요)
-            orders = orderRepository.findByUserId(userId);
+            LocalDateTime startDate = LocalDateTime.now().minusMonths(recentMonths);
+            orders = orderRepository.findByUserIdAndRecentMonths(userId, startDate);
             log.debug("{}개월 주문 내역 조회 - userId: {}, 결과: {}건", recentMonths, userId, orders.size());
         }
 

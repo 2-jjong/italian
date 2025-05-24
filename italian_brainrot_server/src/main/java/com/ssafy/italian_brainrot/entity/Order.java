@@ -31,6 +31,6 @@ public class Order {
     private int totalPrice;
 
     @Builder.Default
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime timeStamp = LocalDateTime.now();
 }

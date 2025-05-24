@@ -7,7 +7,6 @@ import com.ssafy.italian_brainrot.mapper.InventoryMapper;
 import com.ssafy.italian_brainrot.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,102 +17,79 @@ import java.util.Random;
 @Service
 public class InventoryServiceImpl implements InventoryService {
 
-    private static final Logger logger = LoggerFactory.getLogger(InventoryServiceImpl.class);
-
-    @Autowired
-    private InventoryRepository inventoryRepository;
-
-    @Autowired
-    private InventoryMapper inventoryMapper;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private ResourceCardRepository resourceCardRepository;
-
-    @Autowired
-    private CharacterCardRepository characterCardRepository;
+    private final InventoryRepository inventoryRepository;
+    private final InventoryMapper inventoryMapper;
+    private final UserRepository userRepository;
+    private final ResourceCardRepository resourceCardRepository;
+    private final CharacterCardRepository characterCardRepository;
+    private final Logger log = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
     private final Random random = new Random();
+
+    public InventoryServiceImpl(InventoryRepository inventoryRepository,
+                                InventoryMapper inventoryMapper,
+                                UserRepository userRepository,
+                                ResourceCardRepository resourceCardRepository,
+                                CharacterCardRepository characterCardRepository) {
+        this.inventoryRepository = inventoryRepository;
+        this.inventoryMapper = inventoryMapper;
+        this.userRepository = userRepository;
+        this.resourceCardRepository = resourceCardRepository;
+        this.characterCardRepository = characterCardRepository;
+    }
 
     @Override
     public List<InventoryDTO> getInventoryItemList(String userId) {
         // id 순서로 정렬하여 조회 (1~ 재료, 1001~ 캐릭터, 2001~ 카드팩)
         List<Inventory> inventoryList = inventoryRepository.findByUserIdOrderByCardIdAsc(userId);
-        List<InventoryDTO> dtoList = inventoryList.stream()
-                .map(inventory -> inventoryMapper.convert(inventory))
+        return inventoryList.stream()
+                .map(inventoryMapper::convertToInventoryDTO)
                 .toList();
-
-        logger.debug("인벤토리 조회 완료: userId={}, 아이템 수={}", userId, dtoList.size());
-        return dtoList;
     }
 
     @Override
     @Transactional
-    public void addItemToInventory(String userId, int productId, int quantity, InventoryItemType type) {
+    public Boolean InsertItemToInventory(String userId, int productId, int quantity, InventoryItemType type) {
         try {
             User user = userRepository.findById(userId).orElse(null);
             if (user == null) {
-                logger.warn("인벤토리 추가 실패: 사용자를 찾을 수 없음 - userId={}", userId);
-                return;
+                return false;
             }
 
-            // 카드팩인 경우 개봉 처리
-            if (type == InventoryItemType.PACK) {
-                for (int i = 0; i < quantity; i++) {
-                    openCardPack(userId, productId, type);
-                }
-                return;
-            }
-
-            // 기존 인벤토리 아이템 확인
-            Optional<Inventory> existingInventory = inventoryRepository
-                    .findByUserIdAndCardId(userId, productId);
+            Optional<Inventory> existingInventory = inventoryRepository.findByUserIdAndCardId(userId, productId);
 
             if (existingInventory.isPresent()) {
-                // 기존 아이템 수량 증가
                 Inventory inventory = existingInventory.get();
                 inventory.setQuantity(inventory.getQuantity() + quantity);
                 inventoryRepository.save(inventory);
-                logger.debug("인벤토리 수량 증가: userId={}, cardId={}, 기존={}, 추가={}",
-                        userId, productId, inventory.getQuantity() - quantity, quantity);
             } else {
-                // 새 인벤토리 아이템 생성
                 Card card = getCardById(productId, type);
                 if (card == null) {
-                    logger.warn("인벤토리 추가 실패: 카드를 찾을 수 없음 - cardId={}, type={}", productId, type);
-                    return;
+                    return false;
                 }
 
-                Inventory newInventory = Inventory.builder()
+                Inventory entity = Inventory.builder()
                         .user(user)
                         .type(type)
                         .quantity(quantity)
                         .card(card)
                         .build();
 
-                inventoryRepository.save(newInventory);
-                logger.debug("새 인벤토리 아이템 생성: userId={}, cardId={}, quantity={}, type={}",
-                        userId, productId, quantity, type);
+                inventoryRepository.save(entity);
             }
 
+            return true;
         } catch (Exception e) {
-            logger.error("인벤토리 추가 중 오류 발생: userId={}, productId={}, quantity={}, type={}",
-                    userId, productId, quantity, type, e);
+            return false;
         }
     }
 
     @Override
     @Transactional
-    public boolean updateItemQuantity(String userId, int cardId, int quantity) {
+    public Boolean updateItemQuantity(String userId, int cardId, int quantity) {
         try {
             Optional<Inventory> inventoryOpt = inventoryRepository.findByUserIdAndCardId(userId, cardId);
             if (inventoryOpt.isEmpty()) {
-                logger.warn("인벤토리 수량 변경 실패: 아이템을 찾을 수 없음 - userId={}, cardId={}", userId, cardId);
                 return false;
             }
 
@@ -121,42 +97,31 @@ public class InventoryServiceImpl implements InventoryService {
             int newQuantity = inventory.getQuantity() + quantity;
 
             if (newQuantity <= 0) {
-                // 수량이 0 이하면 아이템 삭제
                 inventoryRepository.delete(inventory);
-                logger.debug("인벤토리 아이템 삭제: userId={}, cardId={}, 최종 수량={}", userId, cardId, newQuantity);
             } else {
-                // 수량 업데이트
                 inventory.setQuantity(newQuantity);
                 inventoryRepository.save(inventory);
-                logger.debug("인벤토리 수량 변경: userId={}, cardId={}, 기존={}, 변경={}, 최종={}",
-                        userId, cardId, inventory.getQuantity() - quantity, quantity, newQuantity);
             }
 
             return true;
-
         } catch (Exception e) {
-            logger.error("인벤토리 수량 변경 중 오류 발생: userId={}, cardId={}, quantity={}",
-                    userId, cardId, quantity, e);
             return false;
         }
     }
 
     @Override
     @Transactional
-    public boolean removeItem(String userId, int cardId) {
+    public Boolean removeItem(String userId, int cardId) {
         try {
             Optional<Inventory> inventoryOpt = inventoryRepository.findByUserIdAndCardId(userId, cardId);
             if (inventoryOpt.isEmpty()) {
-                logger.warn("인벤토리 삭제 실패: 아이템을 찾을 수 없음 - userId={}, cardId={}", userId, cardId);
                 return false;
             }
 
             inventoryRepository.delete(inventoryOpt.get());
-            logger.debug("인벤토리 아이템 삭제 완료: userId={}, cardId={}", userId, cardId);
-            return true;
 
+            return true;
         } catch (Exception e) {
-            logger.error("인벤토리 삭제 중 오류 발생: userId={}, cardId={}", userId, cardId, e);
             return false;
         }
     }
@@ -165,6 +130,8 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional
     public void openCardPack(String userId, int packId, InventoryItemType type) {
         try {
+            // TODO: 카드팩 오픈 구현
+
             if (type == InventoryItemType.PACK) {
                 // 재료 카드팩: 10장 랜덤 + 1장 캐릭터 카드 확률
                 if (packId >= 2001) { // 재료 카드팩으로 가정
@@ -176,7 +143,7 @@ public class InventoryServiceImpl implements InventoryService {
             }
 
         } catch (Exception e) {
-            logger.error("카드팩 개봉 중 오류 발생: userId={}, packId={}, type={}", userId, packId, type, e);
+            log.error("카드팩 개봉 중 오류 발생: userId={}, packId={}, type={}", userId, packId, type, e);
         }
     }
 
@@ -187,17 +154,17 @@ public class InventoryServiceImpl implements InventoryService {
         // 10장 재료 카드 랜덤 추가
         for (int i = 0; i < 10; i++) {
             int randomResourceCardId = getRandomResourceCardId();
-            addItemToInventory(userId, randomResourceCardId, 1, InventoryItemType.RESOURCE_CARD);
+            InsertItemToInventory(userId, randomResourceCardId, 1, InventoryItemType.RESOURCE_CARD);
         }
 
         // 캐릭터 카드 확률 (예: 10% 확률)
         if (random.nextInt(100) < 10) {
             int randomCharacterCardId = getRandomCharacterCardId();
-            addItemToInventory(userId, randomCharacterCardId, 1, InventoryItemType.CHARACTER_CARD);
-            logger.debug("보너스 캐릭터 카드 획득: userId={}, cardId={}", userId, randomCharacterCardId);
+            InsertItemToInventory(userId, randomCharacterCardId, 1, InventoryItemType.CHARACTER_CARD);
+            log.debug("보너스 캐릭터 카드 획득: userId={}, cardId={}", userId, randomCharacterCardId);
         }
 
-        logger.debug("재료 카드팩 개봉 완료: userId={}", userId);
+        log.debug("재료 카드팩 개봉 완료: userId={}", userId);
     }
 
     /**
@@ -205,8 +172,8 @@ public class InventoryServiceImpl implements InventoryService {
      */
     private void openCharacterCardPack(String userId) {
         int randomCharacterCardId = getRandomCharacterCardId();
-        addItemToInventory(userId, randomCharacterCardId, 1, InventoryItemType.CHARACTER_CARD);
-        logger.debug("캐릭터 카드팩 개봉 완료: userId={}, cardId={}", userId, randomCharacterCardId);
+        InsertItemToInventory(userId, randomCharacterCardId, 1, InventoryItemType.CHARACTER_CARD);
+        log.debug("캐릭터 카드팩 개봉 완료: userId={}, cardId={}", userId, randomCharacterCardId);
     }
 
     /**

@@ -34,7 +34,6 @@ public class WebConfig implements WebMvcConfigurer {
                         "/user",                 // 회원가입 (POST)
                         "/user/login",           // 로그인
                         "/user/isUsed/**",       // 아이디 중복 확인
-                        "/error",                // 에러 페이지
                         "/swagger-ui/**",        // Swagger UI
                         "/v3/api-docs/**"        // API 문서
                 );

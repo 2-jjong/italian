@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecipeIngredientDTO {
+    private int recipeId;
     private int resourceCardId;
     private int quantity;
-    private int recipeId;
 }

@@ -8,7 +8,6 @@ import com.ssafy.italian_brainrot.enumerate.BattleState;
 import com.ssafy.italian_brainrot.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -16,34 +15,25 @@ import java.util.Map;
 @Service
 public class FcmService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FcmService.class);
+    private final UserRepository userRepository;
+    private final Logger logger = LoggerFactory.getLogger(FcmService.class);
 
-    @Autowired
-    private UserRepository userRepository;
+    public FcmService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
-    /**
-     * 배틀 시작 알림 전송
-     */
     public void sendBattleStartNotification(String userId1, String userId2, int battleId) {
         try {
-            // User1에게 알림
             sendNotificationToUser(userId1, "배틀 시작!", "상대방이 배틀을 수락했습니다.",
                     Map.of("type", "battle_start", "battleId", String.valueOf(battleId)));
 
-            // User2에게 알림
             sendNotificationToUser(userId2, "배틀 시작!", "배틀이 시작되었습니다.",
                     Map.of("type", "battle_start", "battleId", String.valueOf(battleId)));
-
-            logger.debug("배틀 시작 알림 전송 완료: battleId={}, user1={}, user2={}", battleId, userId1, userId2);
-
         } catch (Exception e) {
             logger.error("배틀 시작 알림 전송 실패: battleId={}", battleId, e);
         }
     }
 
-    /**
-     * 배틀 결과 알림 전송
-     */
     public void sendBattleResultNotification(String userId1, String userId2, int battleId, BattleState winner) {
         try {
             String winnerMessage = "축하합니다! 배틀에서 승리했습니다!";
@@ -52,8 +42,7 @@ public class FcmService {
             Map<String, String> data = Map.of(
                     "type", "battle_result",
                     "battleId", String.valueOf(battleId),
-                    "winner", winner.name()
-            );
+                    "winner", winner.name());
 
             if (winner == BattleState.USER1) {
                 // User1 승리
@@ -64,17 +53,11 @@ public class FcmService {
                 sendNotificationToUser(userId1, "배틀 결과", loserMessage, data);
                 sendNotificationToUser(userId2, "배틀 승리!", winnerMessage, data);
             }
-
-            logger.debug("배틀 결과 알림 전송 완료: battleId={}, winner={}", battleId, winner);
-
         } catch (Exception e) {
             logger.error("배틀 결과 알림 전송 실패: battleId={}", battleId, e);
         }
     }
 
-    /**
-     * 특정 사용자에게 FCM 알림 전송
-     */
     private void sendNotificationToUser(String userId, String title, String body, Map<String, String> data) {
         try {
             User user = userRepository.findById(userId).orElse(null);
@@ -83,7 +66,6 @@ public class FcmService {
                 return;
             }
 
-            // TODO: FCM API 호출 구현
             // Firebase Admin SDK를 사용하여 실제 푸시 알림 전송
             logger.debug("FCM 알림 전송 (Mock): userId={}, title={}, body={}, token={}",
                     userId, title, body, user.getFcmToken().substring(0, 10) + "...");

@@ -13,10 +13,7 @@ import java.util.stream.Collectors;
 @Component
 public class CardMapper {
 
-    /**
-     * ResourceCard Entity -> ResourceCardDTO 변환
-     */
-    public ResourceCardDTO convertResourceCardDTO(ResourceCard entity, List<Integer> craftableCharacterCardIds) {
+    public ResourceCardDTO convertToResourceCardDTO(ResourceCard entity, List<Integer> craftableCharacterCardIds) {
         ResourceCardDTO dto = new ResourceCardDTO();
 
         // 부모 필드 설정
@@ -35,10 +32,7 @@ public class CardMapper {
         return dto;
     }
 
-    /**
-     * CharacterCard Entity -> CharacterCardDTO 변환
-     */
-    public CharacterCardDTO convertCharacterCardDTO(CharacterCard entity, Map<Integer, Integer> requiredResourceCards) {
+    public CharacterCardDTO convertToCharacterCardDTO(CharacterCard entity, Map<Integer, Integer> requiredResourceCards) {
         CharacterCardDTO dto = new CharacterCardDTO();
 
         // 부모 필드 설정
@@ -58,29 +52,23 @@ public class CardMapper {
         return dto;
     }
 
-    /**
-     * 단순 변환 (추가 데이터 없이)
-     */
-    public ResourceCardDTO convertResourceCardDTOSimple(ResourceCard entity) {
-        return convertResourceCardDTO(entity, List.of());
+    public ResourceCardDTO convertToResourceCardDTOSimple(ResourceCard entity) {
+        return convertToResourceCardDTO(entity, List.of());
     }
 
-    public CharacterCardDTO convertCharacterCardDTOSimple(CharacterCard entity) {
-        return convertCharacterCardDTO(entity, Map.of());
+    public CharacterCardDTO convertToCharacterCardDTOSimple(CharacterCard entity) {
+        return convertToCharacterCardDTO(entity, Map.of());
     }
 
-    /**
-     * 리스트 변환
-     */
-    public List<ResourceCardDTO> convertResourceCardDTOList(List<ResourceCard> entities) {
+    public List<ResourceCardDTO> convertToResourceCardDTOList(List<ResourceCard> entities) {
         return entities.stream()
-                .map(this::convertResourceCardDTOSimple)
+                .map(this::convertToResourceCardDTOSimple)
                 .collect(Collectors.toList());
     }
 
-    public List<CharacterCardDTO> convertCharacterCardDTOList(List<CharacterCard> entities) {
+    public List<CharacterCardDTO> convertToCharacterCardDTOList(List<CharacterCard> entities) {
         return entities.stream()
-                .map(this::convertCharacterCardDTOSimple)
+                .map(this::convertToCharacterCardDTOSimple)
                 .collect(Collectors.toList());
     }
 }

@@ -7,7 +7,6 @@ import com.ssafy.italian_brainrot.util.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,29 +15,19 @@ import java.util.List;
 @RequestMapping("/inventory")
 public class InventoryController {
 
-    private static final Logger logger = LoggerFactory.getLogger(InventoryController.class);
-
     private final InventoryService inventoryService;
     private final CookieUtil cookieUtil;
+    private final Logger log = LoggerFactory.getLogger(InventoryController.class);
 
     public InventoryController(InventoryService inventoryService, CookieUtil cookieUtil) {
         this.inventoryService = inventoryService;
         this.cookieUtil = cookieUtil;
     }
 
-    /**
-     * 인벤토리 아이템 전체 조회
-     * GET /inventory
-     */
-    @GetMapping
-    public ResponseEntity<List<InventoryDTO>> getInventoryItems(HttpServletRequest request) {
-        // Interceptor에서 이미 인증 체크했으므로 userId 추출
+    @GetMapping("")
+    public List<InventoryDTO> getInventoryItems(HttpServletRequest request) {
         String userId = cookieUtil.getUserIdFromRequest(request);
 
-        List<InventoryDTO> inventoryItems = inventoryService.getInventoryItemList(userId);
-
-        logger.debug("인벤토리 조회 완료: userId={}, 아이템 수={}", userId, inventoryItems.size());
-
-        return ResponseEntity.ok(inventoryItems);
+        return inventoryService.getInventoryItemList(userId);
     }
 }

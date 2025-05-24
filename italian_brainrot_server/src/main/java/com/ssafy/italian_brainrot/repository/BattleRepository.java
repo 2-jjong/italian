@@ -14,25 +14,13 @@ import java.util.Optional;
 @Repository
 public interface BattleRepository extends JpaRepository<Battle, Integer> {
 
-    /**
-     * 특정 사용자의 활성 배틀 조회 (WAITING 상태)
-     */
     Optional<Battle> findByUserid1AndState(String userId, BattleState state);
 
-    /**
-     * 특정 사용자의 모든 배틀 내역 조회 (생성시간 내림차순)
-     */
     @Query("SELECT b FROM Battle b WHERE b.userid1 = :userId OR b.userid2 = :userId ORDER BY b.createdAt DESC")
     List<Battle> findByUserOrderByCreatedAtDesc(@Param("userId") String userId);
 
-    /**
-     * 1분 이상 지난 WAITING 상태 배틀 조회 (자동 취소용)
-     */
-    @Query("SELECT b FROM Battle b WHERE b.state = :state AND b.createdAt < :cutoffTime")
-    List<Battle> findExpiredWaitingBattles(@Param("state") BattleState state, @Param("cutoffTime") LocalDateTime cutoffTime);
+    @Query("SELECT b FROM Battle b WHERE b.state = :state AND b.createdAt < :time")
+    List<Battle> findExpiredWaitingBattles(@Param("state") BattleState state, @Param("time") LocalDateTime time);
 
-    /**
-     * RUNNING 상태 배틀 조회 (결과 처리용)
-     */
     List<Battle> findByState(BattleState state);
 }
