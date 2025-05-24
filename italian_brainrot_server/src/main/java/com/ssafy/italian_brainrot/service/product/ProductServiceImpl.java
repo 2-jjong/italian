@@ -7,13 +7,11 @@ import com.ssafy.italian_brainrot.dto.product.ProductWithCommentDTO;
 import com.ssafy.italian_brainrot.entity.Comment;
 import com.ssafy.italian_brainrot.entity.OrderDetail;
 import com.ssafy.italian_brainrot.entity.Product;
-import com.ssafy.italian_brainrot.entity.User;
 import com.ssafy.italian_brainrot.mapper.CommentMapper;
 import com.ssafy.italian_brainrot.mapper.ProductMapper;
 import com.ssafy.italian_brainrot.repository.CommentRepository;
 import com.ssafy.italian_brainrot.repository.OrderDetailRepository;
 import com.ssafy.italian_brainrot.repository.ProductRepository;
-import com.ssafy.italian_brainrot.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
