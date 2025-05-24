@@ -1,5 +1,6 @@
 package com.ssafy.italian_brainrot.service.user;
 
+import com.ssafy.italian_brainrot.dto.user.GradeDTO;
 import com.ssafy.italian_brainrot.dto.user.UserRequestDTO;
 import com.ssafy.italian_brainrot.dto.user.UserResponseDTO;
 import com.ssafy.italian_brainrot.entity.User;
@@ -10,12 +11,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
+
 
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
@@ -79,4 +85,6 @@ public class UserServiceImpl implements UserService {
         logger.debug("포인트 충전 성공: {} -> {} 포인트 충전, 총 {} 포인트", userId, point, user.getPoint());
         return user.getPoint();
     }
+
+
 }

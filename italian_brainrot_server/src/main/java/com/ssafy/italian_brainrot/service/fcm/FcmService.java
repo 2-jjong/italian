@@ -1,5 +1,8 @@
 package com.ssafy.italian_brainrot.service.fcm;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import com.ssafy.italian_brainrot.entity.User;
 import com.ssafy.italian_brainrot.enumerate.BattleState;
 import com.ssafy.italian_brainrot.repository.UserRepository;
@@ -80,21 +83,21 @@ public class FcmService {
                 return;
             }
 
-            // TODO: 실제 FCM API 호출 구현
+            // TODO: FCM API 호출 구현
             // Firebase Admin SDK를 사용하여 실제 푸시 알림 전송
             logger.debug("FCM 알림 전송 (Mock): userId={}, title={}, body={}, token={}",
                     userId, title, body, user.getFcmToken().substring(0, 10) + "...");
 
-            // 실제 구현 예시:
-            // Message message = Message.builder()
-            //     .setToken(user.getFcmToken())
-            //     .setNotification(Notification.builder()
-            //         .setTitle(title)
-            //         .setBody(body)
-            //         .build())
-            //     .putAllData(data)
-            //     .build();
-            // FirebaseMessaging.getInstance().send(message);
+            Message message = Message.builder()
+                    .setToken(user.getFcmToken())
+                    .setNotification(Notification.builder()
+                            .setTitle(title)
+                            .setBody(body)
+                            .build())
+                    .putAllData(data)
+                    .build();
+
+            FirebaseMessaging.getInstance().send(message);
 
         } catch (Exception e) {
             logger.error("FCM 알림 전송 실패: userId={}", userId, e);

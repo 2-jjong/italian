@@ -4,25 +4,18 @@ import com.ssafy.italian_brainrot.dto.user.UserRequestDTO;
 import com.ssafy.italian_brainrot.dto.user.UserResponseDTO;
 import com.ssafy.italian_brainrot.service.user.UserService;
 import com.ssafy.italian_brainrot.util.CookieUtil;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    private final UserService userService;// 기존 코드 호환을 위해 추가
+    private final UserService userService;
     private final CookieUtil cookieUtil;
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -55,7 +48,7 @@ public class UserController {
 
     @GetMapping
     public UserResponseDTO getUserInfo(HttpServletRequest request) {
-        String userId = getUserIdFromCookie(request);
+        String userId = cookieUtil.getUserIdFromCookie(request);
         if (userId == null) {
             return null;
         }
@@ -103,62 +96,6 @@ public class UserController {
     }
 
     private String getUserIdFromCookie(HttpServletRequest request) {
-        return cookieUtil.getUserIdFromRequest(request);
-    }
-
-    public Map<String, Object> getGrade(Integer stamp) {
-        Map<String, Object> grade = new HashMap<>();
-        int level = 0;
-        int remain = 11;
-        int step = 0;
-        List<Level> levelData = Level.levelData;
-        if (stamp > 0) {
-            stamp--;
-            remain = stamp;
-            for (int i = 0; i < levelData.size() - 1; i++) {
-                if (stamp < levelData.get(i).getMax()) {
-                    if (i > 0) {
-                        remain -= levelData.get(i - 1).getMax();
-                    }
-                    break;
-                }
-                level++;
-            }
-            step = (remain / levelData.get(level).getUnit()) + 1;
-            remain = remain % levelData.get(level).getUnit();
-            remain = levelData.get(level).getUnit() - remain;
-        } else {
-            remain = 1;
-        }
-
-        grade.put("img", levelData.get(level).getImg());
-        grade.put("step", level == 4 ? null : step);
-        grade.put("stepMax", levelData.get(level).getUnit());
-        grade.put("title", levelData.get(level).getTitle());
-        if (level < 4) {
-            grade.put("to", remain);
-        }
-        return grade;
-    }
-}
-
-@Setter
-@Getter
-@AllArgsConstructor
-class Level {
-    private String title;
-    private int unit;
-    private int max;
-    private String img;
-
-    public static List<Level> levelData;
-    static {
-        List<Level> levels = new ArrayList<>();
-        levels.add(new Level("씨앗", 10, 50, "seeds.png"));
-        levels.add(new Level("꽃", 15, 125, "flower.png"));
-        levels.add(new Level("열매", 20, 225, "coffee_fruit.png"));
-        levels.add(new Level("커피콩", 25, 350, "coffee_beans.png"));
-        levels.add(new Level("커피나무", Integer.MAX_VALUE, Integer.MAX_VALUE, "coffee_tree.png"));
-        levelData = levels;
+        return cookieUtil.getUserIdFromCookie(request);
     }
 }

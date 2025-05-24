@@ -1,3 +1,4 @@
+
 package com.ssafy.italian_brainrot.dto.user;
 
 import lombok.*;
@@ -11,7 +12,6 @@ import lombok.*;
 public class UserResponseDTO {
     private String id;
     private String name;
-    private int stamps;
+    private GradeDTO grade;
     private int point;
 }
-

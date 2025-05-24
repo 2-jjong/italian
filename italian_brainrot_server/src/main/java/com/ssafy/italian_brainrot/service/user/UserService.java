@@ -1,5 +1,6 @@
 package com.ssafy.italian_brainrot.service.user;
 
+import com.ssafy.italian_brainrot.dto.user.GradeDTO;
 import com.ssafy.italian_brainrot.dto.user.UserRequestDTO;
 import com.ssafy.italian_brainrot.dto.user.UserResponseDTO;
 
@@ -55,4 +56,6 @@ public interface UserService {
      * @return 반영된 포인트
      */
     public int chargePoint(String userId, int point);
+
+
 }
